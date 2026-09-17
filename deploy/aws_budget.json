@@ -1,0 +1,46 @@
+{
+  "_comment": "AWS Budgets config-as-code, shaped to match `aws budgets create-budget --budget file://Budget --notifications-with-subscribers file://NotificationsWithSubscribers`. Config-as-submitted -- no paid AWS account was available in this environment; see budget_alert_notes.md for the fallback declaration and the exact `aws` CLI invocation that would apply it against a real account.",
+
+  "Budget": {
+    "BudgetName": "afyaplus-triage-monthly",
+    "BudgetLimit": {
+      "Amount": "20",
+      "Unit": "USD"
+    },
+    "BudgetType": "COST",
+    "TimeUnit": "MONTHLY",
+    "CostFilters": {
+      "TagKeyValue": ["user:cost-center$afyaplus-clinical-ops"]
+    },
+    "CostTypes": {
+      "IncludeTax": true,
+      "IncludeSubscription": true,
+      "UseBlended": false
+    }
+  },
+
+  "NotificationsWithSubscribers": [
+    {
+      "Notification": {
+        "NotificationType": "ACTUAL",
+        "ComparisonOperator": "GREATER_THAN",
+        "Threshold": 80,
+        "ThresholdType": "PERCENTAGE"
+      },
+      "Subscribers": [
+        { "SubscriptionType": "EMAIL", "Address": "pmutua@live.com" }
+      ]
+    },
+    {
+      "Notification": {
+        "NotificationType": "FORECASTED",
+        "ComparisonOperator": "GREATER_THAN",
+        "Threshold": 100,
+        "ThresholdType": "PERCENTAGE"
+      },
+      "Subscribers": [
+        { "SubscriptionType": "EMAIL", "Address": "pmutua@live.com" }
+      ]
+    }
+  ]
+}

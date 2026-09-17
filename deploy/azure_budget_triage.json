@@ -1,0 +1,37 @@
+{
+  "_comment": "Azure Consumption Budget (Microsoft.Consumption/budgets@2023-05-01) scoped to the AfyaPlus triage API by the finops.cost-center tag applied in docker-compose.cost.yml. Config-as-submitted -- no paid Azure subscription was available in this environment, so this was never actually applied; see budget_alert_notes.md for the fallback declaration and the exact `az` command that would apply it against a real subscription.",
+  "properties": {
+    "category": "Cost",
+    "amount": 20,
+    "timeGrain": "Monthly",
+    "timePeriod": {
+      "startDate": "2026-09-01T00:00:00Z",
+      "endDate": "2027-09-01T00:00:00Z"
+    },
+    "filter": {
+      "tags": {
+        "name": "cost-center",
+        "operator": "In",
+        "values": ["afyaplus-clinical-ops"]
+      }
+    },
+    "notifications": {
+      "Actual_GreaterThan_80_Percent": {
+        "enabled": true,
+        "operator": "GreaterThan",
+        "threshold": 80,
+        "thresholdType": "Actual",
+        "contactEmails": ["pmutua@live.com"],
+        "contactRoles": ["Owner"]
+      },
+      "Forecasted_GreaterThan_100_Percent": {
+        "enabled": true,
+        "operator": "GreaterThan",
+        "threshold": 100,
+        "thresholdType": "Forecasted",
+        "contactEmails": ["pmutua@live.com"],
+        "contactRoles": ["Owner"]
+      }
+    }
+  }
+}
