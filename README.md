@@ -104,11 +104,14 @@ estimate, not a measurement.
 
 ## Executive one-pager
 
-[`exec/one_pager.md`](exec/one_pager.md) — cost per 1,000 requests, the
-spike plan, both levers in business language, one risk + mitigation
-(urgent-case bypass on both levers), and a **Go** recommendation with
-three explicit conditions (budget alert activation, urgent-case bypass
-staying enforced, re-costing before scaling past the modelled 10x spike).
+[`exec/one_pager.md`](exec/one_pager.md) (written) and
+[`exec/executive_deck.pptx`](exec/executive_deck.pptx) (10-slide deck) —
+cost per 1,000 requests, the spike plan, both levers in business
+language, one risk + mitigation (urgent-case bypass on both levers), and
+a **Go** recommendation with three explicit conditions (budget alert
+activation, urgent-case bypass staying enforced, re-costing before
+scaling past the modelled 10x spike). Same numbers, same recommendation,
+two formats for two audiences.
 
 ## Fallbacks declared
 
