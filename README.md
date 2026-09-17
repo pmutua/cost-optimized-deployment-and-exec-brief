@@ -1,5 +1,7 @@
 # Week 7, Cost-Optimised AI Deployment
 
+[Presentation Link](https://docs.google.com/presentation/d/e/2PACX-1vTBLmyzZN926W5igCxwx0m3LkYe5861YWVlyQiW0-reNU4o-TZ9ivpC1dYw7o9P43NfeflfsQfPSGQS/pub?start=false&loop=false&delayms=3000)
+
 ## Overview
 
 AfyaPlus triage API (`api/`, Week 6's FastAPI + Docker + JWT spine,
@@ -105,7 +107,8 @@ estimate, not a measurement.
 ## Executive one-pager
 
 [`exec/one_pager.md`](exec/one_pager.md) (written) and
-[`exec/executive_deck.pptx`](exec/executive_deck.pptx) (10-slide deck) —
+[`exec/executive_deck.pptx`](exec/executive_deck.pptx) (10-slide deck,
+[published version](https://docs.google.com/presentation/d/e/2PACX-1vTBLmyzZN926W5igCxwx0m3LkYe5861YWVlyQiW0-reNU4o-TZ9ivpC1dYw7o9P43NfeflfsQfPSGQS/pub?start=false&loop=false&delayms=3000)) —
 cost per 1,000 requests, the spike plan, both levers in business
 language, one risk + mitigation (urgent-case bypass on both levers), and
 a **Go** recommendation with three explicit conditions (budget alert
