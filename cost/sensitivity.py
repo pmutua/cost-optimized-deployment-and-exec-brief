@@ -55,7 +55,7 @@ def print_report() -> None:
         ("completion tokens", "120 (full cap)", cost_per_1k(completion_tokens=120)),
         ("patient msg tokens", "30 (short)", cost_per_1k(prompt_tokens=143 + 30)),
         ("patient msg tokens", "150 (long)", cost_per_1k(prompt_tokens=143 + 150)),
-        ("cache hit-rate", "30% (measured, see levers/)", cost_per_1k(cache_hit_rate=0.30)),
+        ("cache hit-rate", "40% (measured, see levers/)", cost_per_1k(cache_hit_rate=0.40)),
         ("cache hit-rate", "60% (optimistic)", cost_per_1k(cache_hit_rate=0.60)),
         ("traffic", f"{BASELINE_REQ_PER_DAY // 2}/day (half baseline)", cost_per_1k(requests_per_day=BASELINE_REQ_PER_DAY // 2)),
         ("traffic", f"{BASELINE_REQ_PER_DAY * 10}/day (10x spike)", cost_per_1k(requests_per_day=BASELINE_REQ_PER_DAY * 10)),
