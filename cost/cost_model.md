@@ -70,7 +70,7 @@ completion tokens   48 (0.4x cap)                   1.6426  -0.0144
 completion tokens   120 (full cap)                  1.6858  +0.0288
 patient msg tokens  30 (short)                      1.6525  -0.0045
 patient msg tokens  150 (long)                      1.6705  +0.0135
-cache hit-rate      30% (measured, see levers/)     1.6349  -0.0221
+cache hit-rate      40% (measured, see levers/)     1.6275  -0.0295
 cache hit-rate      60% (optimistic)                1.6128  -0.0442
 traffic             1000/day (half baseline)        3.2403  +1.5833
 traffic             20000/day (10x spike)           0.3070  -1.3500
