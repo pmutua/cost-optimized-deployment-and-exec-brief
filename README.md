@@ -116,6 +116,34 @@ activation, urgent-case bypass staying enforced, re-costing before
 scaling past the modelled 10x spike). Same numbers, same recommendation,
 two formats for two audiences.
 
+## Screenshot evidence
+
+Terminal captures proving each command below was actually run, not just
+described — full index with context at
+[`screenshots/README.md`](screenshots/README.md).
+
+**Cost model** (`cd cost`)
+
+| `python cost_model.py` | `python sensitivity.py` |
+|---|---|
+| [![cost model output](screenshots/d1-01-cost-model-output.png)](screenshots/d1-01-cost-model-output.png) | [![sensitivity output](screenshots/d1-02-sensitivity-output.png)](screenshots/d1-02-sensitivity-output.png) |
+
+**Deploy & budgets** (`cd deploy`)
+
+| `docker compose ... up --build -d` | `docker compose ... ps` |
+|---|---|
+| [![compose up](screenshots/d2-01-compose-up.png)](screenshots/d2-01-compose-up.png) | [![compose ps](screenshots/d2-02-compose-ps.png)](screenshots/d2-02-compose-ps.png) |
+
+| `curl http://localhost:8000/health` | `docker inspect ... Labels` |
+|---|---|
+| [![health check](screenshots/d2-03-health-check.png)](screenshots/d2-03-health-check.png) | [![FinOps labels](screenshots/d2-04-finops-labels.png)](screenshots/d2-04-finops-labels.png) |
+
+**Levers** (`cd levers`)
+
+| `python cache_triage.py` | `python cache_hitrate.py` | `python batch_worker.py` |
+|---|---|---|
+| [![cache miss/hit](screenshots/d3-01-cache-miss-hit.png)](screenshots/d3-01-cache-miss-hit.png) | [![cache hit-rate](screenshots/d3-02-cache-hitrate-report.png)](screenshots/d3-02-cache-hitrate-report.png) | [![batch worker](screenshots/d3-03-batch-worker-report.png)](screenshots/d3-03-batch-worker-report.png) |
+
 ## Fallbacks declared
 
 - [x] Redis / dict cache — no Redis; in-memory TTL dict cache used
