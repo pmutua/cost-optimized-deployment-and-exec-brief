@@ -4,30 +4,51 @@
 
 ## Overview
 
-AfyaPlus triage API (`api/`, Week 6's FastAPI + Docker + JWT spine,
-unchanged — see `api/README.md`): one `gpt-4o-mini` call per request,
-classifying patient message urgency and returning safe, non-diagnostic
-advice. Baseline traffic is modelled at 2,000 requests/day, with a stated
-10x spike scenario (20,000 requests/day) per the capstone brief. Unit
-metric: **$/1,000 requests** — **$1.66 at baseline, $0.31 at the 10x
-spike** (cost per 1,000 *drops* under load because fixed infra/ops costs
-are spread across far more requests while the per-request AI cost stays
-flat — see `cost/cost_model.md` for why).
+AfyaPlus triage API ([`api/`](api/), Week 6's FastAPI + Docker + JWT
+spine, unchanged — see [`api/README.md`](api/README.md)): one
+`gpt-4o-mini` call per request, classifying patient message urgency and
+returning safe, non-diagnostic advice. Baseline traffic is modelled at
+2,000 requests/day, with a stated 10x spike scenario (20,000
+requests/day) per the capstone brief. Unit metric: **$/1,000 requests**
+— **$1.66 at baseline, $0.31 at the 10x spike** (cost per 1,000 *drops*
+under load because fixed infra/ops costs are spread across far more
+requests while the per-request AI cost stays flat — see
+[`cost/cost_model.md`](cost/cost_model.md) for why).
+
+## Technologies
+
+- **API service** — Python 3, [FastAPI](api/README.md), JWT auth,
+  containerised with [Docker](api/Dockerfile); `POST /triage` calls
+  OpenAI's `gpt-4o-mini`, `POST /ask-logistics` runs a LangChain/MCP
+  agent — all Week 6 spine, unchanged.
+- **Cost model & levers** — plain Python
+  ([`cost/cost_model.py`](cost/cost_model.py),
+  [`levers/cache_triage.py`](levers/cache_triage.py),
+  [`levers/batch_worker.py`](levers/batch_worker.py)), no extra
+  frameworks, run against a stubbed model so no live OpenAI key is
+  spent.
+- **Deploy** — [Docker Compose](deploy/docker-compose.cost.yml) for the
+  local run; budget alerts declared as config-as-code for
+  [Azure Cost Management](deploy/azure_budget_triage.json) and
+  [AWS Budgets](deploy/aws_budget.json).
+- **Exec deliverable** — Markdown one-pager plus a PowerPoint
+  (`.pptx`) deck, published as
+  [Google Slides](https://docs.google.com/presentation/d/e/2PACX-1vTBLmyzZN926W5igCxwx0m3LkYe5861YWVlyQiW0-reNU4o-TZ9ivpC1dYw7o9P43NfeflfsQfPSGQS/pub?start=false&loop=false&delayms=3000).
 
 ## Repo layout
 
 Matches the capstone brief's target layout exactly — one folder per
 deliverable, nothing renamed:
 
-```
-api/       Week 6 spine (unchanged) — see api/README.md
-cost/      Deliverable 1 — cost model, sensitivity, $/1k writeup
-deploy/    Deliverable 2 — docker-compose, budget alert configs
-levers/    Deliverable 3 — cache + batch levers, measurements
-memo/      Deliverable 4 — API vs self-host trade-off memo
-exec/      Deliverable 5 — executive one-pager
-evidence/  Captured terminal transcripts (local run, health check, tags)
-```
+- [`api/`](api/) — Week 6 spine (unchanged), see [`api/README.md`](api/README.md)
+- [`cost/`](cost/) — Deliverable 1: cost model, sensitivity, $/1k writeup
+- [`deploy/`](deploy/) — Deliverable 2: docker-compose, budget alert configs
+- [`levers/`](levers/) — Deliverable 3: cache + batch levers, measurements
+- [`memo/`](memo/) — Deliverable 4: API vs self-host trade-off memo
+- [`exec/`](exec/) — Deliverable 5: executive one-pager and deck
+- [`evidence/`](evidence/) — Captured terminal transcripts (local run, health check, tags)
+- [`screenshots/`](screenshots/) — Screenshot evidence index ([`screenshots/README.md`](screenshots/README.md)) and shot list ([`screenshots/SHOT_LIST.md`](screenshots/SHOT_LIST.md))
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — gitflow branching, commit, and versioning conventions used across this repo
 
 ## Cost model
 
@@ -71,19 +92,24 @@ curl http://localhost:8000/health
 
 ## Levers implemented
 
-Both run against a stubbed model (`levers/stub_model.py`, same response
-schema as the real endpoint) — no live API key spent. Full evidence and
-honesty notes: [`levers/measurements.md`](levers/measurements.md).
+Both run against a stubbed model
+([`levers/stub_model.py`](levers/stub_model.py), same response schema
+as the real endpoint) over a shared fixture set
+([`levers/fixtures.py`](levers/fixtures.py)) — no live API key spent.
+Full evidence and honesty notes:
+[`levers/measurements.md`](levers/measurements.md).
 
-1. **Response caching** (`levers/cache_triage.py`) — in-memory TTL dict
-   cache. Measured **40% hit rate** on a 20-request fixture, cutting the
-   AI-call token cost by the same share. High-urgency responses are
-   never cached (safety over savings).
-2. **Batch queue** (`levers/batch_worker.py`) — groups concurrent
-   requests into one call, sharing the fixed system-prompt token cost.
-   Measured **~20% token $/1k reduction** during busy periods, at the
-   cost of up to **2.55s p95 added latency** during quiet periods —
-   stated plainly as a trade-off, not hidden.
+1. **Response caching** ([`levers/cache_triage.py`](levers/cache_triage.py),
+   hit-rate report in [`levers/cache_hitrate.py`](levers/cache_hitrate.py))
+   — in-memory TTL dict cache. Measured **40% hit rate** on a 20-request
+   fixture, cutting the AI-call token cost by the same share.
+   High-urgency responses are never cached (safety over savings).
+2. **Batch queue** ([`levers/batch_worker.py`](levers/batch_worker.py))
+   — groups concurrent requests into one call, sharing the fixed
+   system-prompt token cost. Measured **~20% token $/1k reduction**
+   during busy periods, at the cost of up to **2.55s p95 added
+   latency** during quiet periods — stated plainly as a trade-off, not
+   hidden.
 
 Quality notes: caching risks TTL-window staleness only for an exact
 repeated message (mitigated by the high-urgency bypass); batching risks
@@ -116,6 +142,35 @@ activation, urgent-case bypass staying enforced, re-costing before
 scaling past the modelled 10x spike). Same numbers, same recommendation,
 two formats for two audiences.
 
+## Screenshot evidence
+
+Terminal captures proving each command below was actually run, not just
+described — full index with context at
+[`screenshots/README.md`](screenshots/README.md), captured per the
+steps in [`screenshots/SHOT_LIST.md`](screenshots/SHOT_LIST.md).
+
+**Cost model** (`cd cost`)
+
+| `python cost_model.py` | `python sensitivity.py` |
+|---|---|
+| [![cost model output](screenshots/d1-01-cost-model-output.png)](screenshots/d1-01-cost-model-output.png) | [![sensitivity output](screenshots/d1-02-sensitivity-output.png)](screenshots/d1-02-sensitivity-output.png) |
+
+**Deploy & budgets** (`cd deploy`)
+
+| `docker compose ... up --build -d` | `docker compose ... ps` |
+|---|---|
+| [![compose up](screenshots/d2-01-compose-up.png)](screenshots/d2-01-compose-up.png) | [![compose ps](screenshots/d2-02-compose-ps.png)](screenshots/d2-02-compose-ps.png) |
+
+| `curl http://localhost:8000/health` | `docker inspect ... Labels` |
+|---|---|
+| [![health check](screenshots/d2-03-health-check.png)](screenshots/d2-03-health-check.png) | [![FinOps labels](screenshots/d2-04-finops-labels.png)](screenshots/d2-04-finops-labels.png) |
+
+**Levers** (`cd levers`)
+
+| `python cache_triage.py` | `python cache_hitrate.py` | `python batch_worker.py` |
+|---|---|---|
+| [![cache miss/hit](screenshots/d3-01-cache-miss-hit.png)](screenshots/d3-01-cache-miss-hit.png) | [![cache hit-rate](screenshots/d3-02-cache-hitrate-report.png)](screenshots/d3-02-cache-hitrate-report.png) | [![batch worker](screenshots/d3-03-batch-worker-report.png)](screenshots/d3-03-batch-worker-report.png) |
+
 ## Fallbacks declared
 
 - [x] Redis / dict cache — no Redis; in-memory TTL dict cache used
@@ -133,8 +188,9 @@ two formats for two audiences.
       scripts (`levers/`) run entirely against a stubbed model
       (`levers/stub_model.py`), same response schema as the real
       endpoint, so no live key is spent running this repo's evidence.
-      The real `api/app/triage_model.py` still makes a real call when a
-      key is configured — it is untouched from Week 6.
+      The real [`api/app/triage_model.py`](api/app/triage_model.py) still
+      makes a real call when a key is configured — it is untouched
+      from Week 6.
 - [ ] No Kubernetes cluster — not applicable; Week 6's `deployment.yaml`
       (in `api/`) already documents this as a read-only manifest with no
       live cluster, per that capstone's own fallback note.
